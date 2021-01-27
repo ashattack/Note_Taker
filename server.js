@@ -2,13 +2,18 @@ const express = require("express");
 var path = require("path");
 var fs = require("fs");
 
-var app = express();
+const app = express();
 
 
 var PORT = process.env.PORT || 8080;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static("public"));
+
+require("./Routes/apiRoutes")(app)
+require("./Routes/htmlRoutes")(app)
+
 
 function newNote(note) {
     fs.readFile('./db/db.json', 'utf8', function readFileCallback(err, data) {
@@ -31,39 +36,6 @@ function newNote(note) {
     });
 
 }
-
-//Routes
-
-app.get("/notes", function (req, res) {
-    res.sendFile(path.join(__dirname, "./public/notes.html"));
-});
-
-app.get("/api/notes", function (req, res) {
-    res.sendFile(path.join(__dirname, "./db/db.json"));
-});
-
-app.post("/api/notes", function (req, res) {
-
-    var newNotes = req.body;
-
-    newNote(newNotes);
-
-    console.log(newNotes);
-
-    res.json(newNotes);
-
-});
-
-app.delete('/api/notes/:id', function (req, res) {
-    const id = req.params.id;
-    console.log(id); // should display 123
-    res.json(id);
-});
-
-app.get("*", function (req, res) {
-    res.sendFile(path.join(__dirname, "./public/index.html"));
-});
-
 
 
 
